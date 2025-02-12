@@ -131,7 +131,7 @@ href="https://i.imgur.com/ZBlHjQj.png">
     </video>
 
     <div class="container">
-        <img src="https://i.imgur.com/DlTdMxC.jpeg" class="logo" alt="Logo Perusahaan" onclick="location.reload()">
+        <img src="https://i.imgur.com/ZBlHjQj.png" class="logo" alt="Logo Perusahaan" onclick="location.reload()">
         <h2>Cek Tarif TSL</h2>
         
         <div class="input-group">
@@ -221,7 +221,7 @@ href="https://i.imgur.com/ZBlHjQj.png">
                 } else {
                     harga = "Negotiable";
                 }
-                let waMessage = encodeURIComponent(`Halo Irfan, Saya ingin menanyakan tarif pengiriman dengan tonase ${formatAngka(tonase)} Kg dan jarak ${jarak} Km.`);
+                let waMessage = encodeURIComponent(`Halo Irfan, Saya ingin menanyakan tarif pengiriman dengan tonase ${formatAngka(tonase)} Kg dengan jarak ${jarak} Km.`);
                 let waLink = `<a href="https://wa.me/6289502702764?text=${waMessage}" target="_blank" class="wa-link"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"> Chat Admin</a>`;
                 hasilDiv.innerHTML = `<p>📏 Jarak: ${jarak} Km |     ⚖️Tonase: ${formatAngka(tonase)} Kg</p>` +
                     (harga === "Negotiable" ? `<p>💰 Harga: <strong>Negotiable</strong></p>${waLink}` : `<p>💰 Harga: <strong>Rp ${formatAngka(harga)}</strong></p>`);
