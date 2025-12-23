@@ -1,198 +1,234 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<title>TSL - Cek Tarif</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cek Tarif TSL</title>
+    <link rel="icon" type="image/png"
+href="https://i.imgur.com/ZBlHjQj.png">
+    <style>
+        /* Menambahkan video sebagai background */
+        body, html {
+            height: 100%;
+            margin: 0;
+        }
+        .background-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1; /* Pastikan video berada di belakang konten */
+        }
 
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
-
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-}
-
-header {
-  background: #0b3d1b;
-  color: white;
-  padding: 14px 20px;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.container {
-  display: flex;
-  height: calc(100vh - 52px);
-}
-
-.form {
-  width: 360px;
-  padding: 15px;
-  background: #f5f5f5;
-}
-
-.form label {
-  font-weight: bold;
-  display: block;
-  margin-top: 12px;
-}
-
-.form input, .form select {
-  width: 100%;
-  padding: 8px;
-  margin-top: 4px;
-}
-
-.suggestions {
-  background: white;
-  border: 1px solid #ccc;
-  max-height: 160px;
-  overflow-y: auto;
-  position: absolute;
-  width: 330px;
-  z-index: 1000;
-}
-
-.suggestions div {
-  padding: 8px;
-  cursor: pointer;
-}
-
-.suggestions div:hover {
-  background: #eee;
-}
-
-button {
-  margin-top: 15px;
-  width: 100%;
-  padding: 10px;
-  background: #0b3d1b;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-#map {
-  flex: 1;
-}
-</style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            width: 100px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            text-align: left;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        button {
+            width: 100%;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #333;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+        }
+        .loading {
+            display: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 10px;
+            animation: blink 1s infinite alternate;
+        }
+        @keyframes blink {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+        .wa-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #25D366;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        .wa-link img {
+            width: 20px;
+            height: 20px;
+        }
+        .wa-link:hover {
+            transform: scale(1.1);
+        }
+    </style>
 </head>
-
 <body>
+    <!-- Menambahkan video sebagai background -->
+    <video autoplay loop muted class="background-video">
+        <source src="https://i.imgur.com/Mce6742.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
 
-<header>🚚 PT TAL SARANA LOGISTIK – Cek Tarif</header>
+    <div class="container">
+        <img src="https://i.imgur.com/ZBlHjQj.png" class="logo" alt="Logo Perusahaan" onclick="location.reload()">
+        <h2>Cek Tarif TSL</h2>
+        
+        <div class="input-group">
+            <label for="tonase">Tonase (Kg):</label>
+            <input type="text" inputmode="numeric" id="tonase" placeholder="Masukkan tonase" oninput="validateTonase(this)">
+            <div class="error" id="errorTonase"></div>
+        </div>
+        
+        <div class="input-group">
+            <label for="jarak">Jarak (Km):</label>
+            <input type="number" inputmode="numeric" id="jarak" placeholder="Masukkan jarak" oninput="validateJarak(this)">
+            <div class="error" id="errorJarak"></div>
+        </div>
+        
+        <button onclick="hitungHarga()">Hitung Harga</button>
+        <div class="loading" id="loading">🔄 Menghitung...</div>
+        <div class="result" id="hasil"></div>
+    </div>
 
-<div class="container">
-  <div class="form">
-    <label>Lokasi Jemput</label>
-    <input id="pickup" placeholder="Contoh: Jakarta" autocomplete="off" />
-    <div id="pickupList" class="suggestions"></div>
+    <script>
+        function formatAngka(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
 
-    <label>Lokasi Tujuan</label>
-    <input id="dropoff" placeholder="Contoh: Tangerang" autocomplete="off" />
-    <div id="dropoffList" class="suggestions"></div>
+        function validateTonase(input) {
+            let angka = input.value.replace(/\D/g, "");
+            if (parseInt(angka) > 20000) {
+                document.getElementById("errorTonase").innerText = "Maksimal tonase hanya 20.000 Kg";
+                input.value = "20.000";
+            } else {
+                document.getElementById("errorTonase").innerText = "";
+                input.value = formatAngka(angka);
+            }
+        }
 
-    <label>Jenis Kendaraan</label>
-    <select id="vehicle">
-      <option value="5000">CDD</option>
-      <option value="7000">Fuso</option>
-      <option value="9000">Wingbox</option>
-    </select>
+        function validateJarak(input) {
+            if (parseInt(input.value) > 250) {
+                document.getElementById("errorJarak").innerText = "Maksimal jarak hanya 250 Km";
+                input.value = "250";
+            } else {
+                document.getElementById("errorJarak").innerText = "";
+            }
+        }
 
-    <button onclick="hitung()">Hitung Estimasi</button>
+        function hitungHarga() {
+            let tonaseInput = document.getElementById("tonase");
+            let jarakInput = document.getElementById("jarak");
+            let tonase = parseFloat(tonaseInput.value.replace(/\./g, "")) || 0;
+            let jarak = parseFloat(jarakInput.value) || 0;
+            let hasilDiv = document.getElementById("hasil");
+            let loadingDiv = document.getElementById("loading");
+            let errorTonase = document.getElementById("errorTonase");
+            let errorJarak = document.getElementById("errorJarak");
+            let isValid = true;
 
-    <p id="hasil"></p>
-  </div>
+            // Reset error message and input border
+            errorTonase.innerText = "";
+            errorJarak.innerText = "";
+            tonaseInput.style.border = "1px solid #ddd";
+            jarakInput.style.border = "1px solid #ddd";
 
-  <div id="map"></div>
-</div>
+            // Validasi input kosong
+            if (!tonaseInput.value.trim()) {
+                errorTonase.innerText = "Harap isi tonase!";
+                tonaseInput.style.border = "2px solid red";
+                isValid = false;
+            }
+            if (!jarakInput.value.trim()) {
+                errorJarak.innerText = "Harap isi jarak!";
+                jarakInput.style.border = "2px solid red";
+                isValid = false;
+            }
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            if (!isValid) return; // Jika ada error, hentikan eksekusi
 
-<script>
-const map = L.map("map").setView([-6.2, 106.8], 8);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution: "© OpenStreetMap"
-}).addTo(map);
+            loadingDiv.style.display = "block";
+            hasilDiv.innerHTML = "";
 
-let pickupData = null;
-let dropoffData = null;
-let marker1 = null;
-let marker2 = null;
-
-function setupAutocomplete(inputId, listId, callback) {
-  const input = document.getElementById(inputId);
-  const list = document.getElementById(listId);
-
-  input.addEventListener("input", async () => {
-    const q = input.value;
-    if (q.length < 3) {
-      list.innerHTML = "";
-      return;
-    }
-
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=5`
-    );
-    const data = await res.json();
-
-    list.innerHTML = "";
-    data.forEach(item => {
-      const div = document.createElement("div");
-      div.textContent = item.display_name;
-      div.onclick = () => {
-        input.value = item.display_name;
-        list.innerHTML = "";
-        callback(item);
-      };
-      list.appendChild(div);
-    });
-  });
-}
-
-setupAutocomplete("pickup", "pickupList", data => {
-  pickupData = data;
-  if (marker1) map.removeLayer(marker1);
-  marker1 = L.marker([data.lat, data.lon]).addTo(map);
-  map.setView([data.lat, data.lon], 10);
-});
-
-setupAutocomplete("dropoff", "dropoffList", data => {
-  dropoffData = data;
-  if (marker2) map.removeLayer(marker2);
-  marker2 = L.marker([data.lat, data.lon]).addTo(map);
-  map.setView([data.lat, data.lon], 10);
-});
-
-function hitung() {
-  if (!pickupData || !dropoffData) {
-    alert("Pilih lokasi dari dropdown terlebih dahulu");
-    return;
-  }
-
-  const R = 6371;
-  const dLat = (dropoffData.lat - pickupData.lat) * Math.PI / 180;
-  const dLon = (dropoffData.lon - pickupData.lon) * Math.PI / 180;
-
-  const a =
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(pickupData.lat * Math.PI/180) *
-    Math.cos(dropoffData.lat * Math.PI/180) *
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  const distance = R * c;
-
-  const rate = document.getElementById("vehicle").value;
-  const price = Math.round(distance * rate);
-
-  document.getElementById("hasil").innerHTML =
-    `Jarak: ${distance.toFixed(1)} km<br>Estimasi Harga: Rp ${price.toLocaleString("id-ID")}`;
-}
-</script>
-
+            setTimeout(() => {
+                loadingDiv.style.display = "none";
+                let harga;
+                if (jarak <= 100) {
+                    if (tonase <= 500) harga = (jarak <= 50) ? 150000 : 300000;
+                    else if (tonase <= 3000) harga = tonase * ((jarak <= 50) ? 250 : 300);
+                    else if (tonase <= 5000) harga = tonase * ((jarak <= 50) ? 150 : 275);
+                    else if (tonase <= 20000) harga = tonase * ((jarak <= 50) ? 125 : 250);
+                } else {
+                    harga = "Negotiable";
+                }
+                let waMessage = encodeURIComponent(`Halo Irfan, Saya ingin menanyakan tarif pengiriman dengan tonase ${formatAngka(tonase)} Kg dengan jarak ${jarak} Km.`);
+                let waLink = `<a href="https://wa.me/628131342202?text=${waMessage}" target="_blank" class="wa-link"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"> Chat Admin</a>`;
+                hasilDiv.innerHTML = `<p>📏 Jarak: ${jarak} Km |     ⚖️Tonase: ${formatAngka(tonase)} Kg</p>` +
+                    (harga === "Negotiable" ? `<p>💰 Harga: <strong>Negotiable</strong></p>${waLink}` : `<p>💰 Harga: <strong>Rp ${formatAngka(harga)}</strong></p>`);
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
+
+
