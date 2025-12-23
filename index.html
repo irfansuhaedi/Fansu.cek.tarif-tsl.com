@@ -1,224 +1,197 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Cek Tarif | PT TAL SARANA LOGISTIK</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<title>TSL - Cek Tarif</title>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
 
 <style>
-:root{
-    --green:#2e9f42;
-    --dark:#1f2937;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
 }
-body{
-    margin:0;
-    font-family:Segoe UI,Arial;
-    background:#f3f6f4;
+
+header {
+  background: #0b3d1b;
+  color: white;
+  padding: 14px 20px;
+  font-size: 18px;
+  font-weight: bold;
 }
-header{
-    background:var(--green);
-    color:#fff;
-    padding:14px 20px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+
+.container {
+  display: flex;
+  height: calc(100vh - 52px);
 }
-header strong{font-size:18px}
-header a{
-    color:#fff;
-    text-decoration:none;
-    background:#1ebe57;
-    padding:8px 12px;
-    border-radius:6px;
-    font-size:14px;
+
+.form {
+  width: 360px;
+  padding: 15px;
+  background: #f5f5f5;
 }
-.main{
-    display:flex;
-    height:calc(100vh - 60px);
+
+.form label {
+  font-weight: bold;
+  display: block;
+  margin-top: 12px;
 }
-.form{
-    width:420px;
-    background:#fff;
-    padding:18px;
-    box-shadow:2px 0 10px rgba(0,0,0,.08);
-    overflow:auto;
+
+.form input, .form select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
 }
-label{
-    font-weight:600;
-    margin-top:12px;
-    display:block;
+
+.suggestions {
+  background: white;
+  border: 1px solid #ccc;
+  max-height: 160px;
+  overflow-y: auto;
+  position: absolute;
+  width: 330px;
+  z-index: 1000;
 }
-input,select{
-    width:100%;
-    padding:10px;
-    margin-top:6px;
-    border-radius:6px;
-    border:1px solid #ccc;
+
+.suggestions div {
+  padding: 8px;
+  cursor: pointer;
 }
-button{
-    width:100%;
-    margin-top:16px;
-    padding:12px;
-    background:var(--green);
-    color:#fff;
-    border:none;
-    border-radius:8px;
-    font-size:16px;
-    cursor:pointer;
+
+.suggestions div:hover {
+  background: #eee;
 }
-button:hover{background:#248a37}
-.suggest{
-    position:relative;
-    background:#fff;
-    border:1px solid #ddd;
-    border-radius:6px;
-    max-height:180px;
-    overflow:auto;
-    z-index:999;
+
+button {
+  margin-top: 15px;
+  width: 100%;
+  padding: 10px;
+  background: #0b3d1b;
+  color: white;
+  border: none;
+  cursor: pointer;
 }
-.suggest div{
-    padding:8px;
-    cursor:pointer;
-    border-bottom:1px solid #eee;
+
+#map {
+  flex: 1;
 }
-.suggest div:hover{background:#f0f7ee}
-.result{
-    margin-top:16px;
-    background:#f9fafb;
-    padding:14px;
-    border-radius:10px;
-    font-size:14px;
-}
-.result b{font-size:16px}
-small{color:#555}
-#map{flex:1}
 </style>
 </head>
 
 <body>
 
-<header>
-    <strong>🚚 PT TAL SARANA LOGISTIK</strong>
-    <a href="https://wa.me/628131342202" target="_blank">💬 Chat Admin</a>
-</header>
+<header>🚚 PT TAL SARANA LOGISTIK – Cek Tarif</header>
 
-<div class="main">
+<div class="container">
+  <div class="form">
+    <label>Lokasi Jemput</label>
+    <input id="pickup" placeholder="Contoh: Jakarta" autocomplete="off" />
+    <div id="pickupList" class="suggestions"></div>
 
-<div class="form">
+    <label>Lokasi Tujuan</label>
+    <input id="dropoff" placeholder="Contoh: Tangerang" autocomplete="off" />
+    <div id="dropoffList" class="suggestions"></div>
 
-<label>Lokasi Jemput</label>
-<input id="from" placeholder="Contoh: Gudang, Jalan Raya, Tangerang">
-<div id="fromSuggest" class="suggest"></div>
+    <label>Jenis Kendaraan</label>
+    <select id="vehicle">
+      <option value="5000">CDD</option>
+      <option value="7000">Fuso</option>
+      <option value="9000">Wingbox</option>
+    </select>
 
-<label>Lokasi Tujuan</label>
-<input id="to" placeholder="Contoh: Jakarta Barat">
-<div id="toSuggest" class="suggest"></div>
+    <button onclick="hitung()">Hitung Estimasi</button>
 
-<label>Jenis Kendaraan</label>
-<select id="kendaraan">
-    <option value="8500">Pickup / Engkel</option>
-    <option value="11000">CDD</option>
-    <option value="14000">Fuso</option>
-    <option value="18000">Tronton</option>
-</select>
+    <p id="hasil"></p>
+  </div>
 
-<button onclick="hitung()">Hitung Estimasi</button>
-
-<div id="hasil" class="result">
-<small>Masukkan lokasi jemput & tujuan</small>
-</div>
-
-</div>
-
-<div id="map"></div>
-
+  <div id="map"></div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-const CHARGE_PP = 50000;
-const WA = "628131342202";
+const map = L.map("map").setView([-6.2, 106.8], 8);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: "© OpenStreetMap"
+}).addTo(map);
 
-const map = L.map('map').setView([-6.2,106.8],10);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+let pickupData = null;
+let dropoffData = null;
+let marker1 = null;
+let marker2 = null;
 
-let fromMarker,toMarker,line;
-let fromLatLng,toLatLng;
+function setupAutocomplete(inputId, listId, callback) {
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
 
-async function search(q){
-    if(q.length<3) return [];
-    const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6&lang=id`);
-    const d=await r.json();
-    return d.features||[];
-}
+  input.addEventListener("input", async () => {
+    const q = input.value;
+    if (q.length < 3) {
+      list.innerHTML = "";
+      return;
+    }
 
-function auto(inputId,suggestId,type){
-    const i=document.getElementById(inputId);
-    const s=document.getElementById(suggestId);
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=5`
+    );
+    const data = await res.json();
 
-    i.addEventListener("input",async()=>{
-        s.innerHTML="";
-        const r=await search(i.value);
-        r.forEach(p=>{
-            const d=document.createElement("div");
-            d.innerText=p.properties.name||p.properties.street||"Lokasi";
-            d.onclick=()=>{
-                i.value=d.innerText;
-                s.innerHTML="";
-                const ll=[p.geometry.coordinates[1],p.geometry.coordinates[0]];
-                if(type==="from"){
-                    if(fromMarker)map.removeLayer(fromMarker);
-                    fromLatLng=ll;
-                    fromMarker=L.marker(ll).addTo(map).bindPopup("Jemput");
-                }else{
-                    if(toMarker)map.removeLayer(toMarker);
-                    toLatLng=ll;
-                    toMarker=L.marker(ll).addTo(map).bindPopup("Tujuan");
-                }
-                draw();
-            }
-            s.appendChild(d);
-        });
+    list.innerHTML = "";
+    data.forEach(item => {
+      const div = document.createElement("div");
+      div.textContent = item.display_name;
+      div.onclick = () => {
+        input.value = item.display_name;
+        list.innerHTML = "";
+        callback(item);
+      };
+      list.appendChild(div);
     });
+  });
 }
 
-function draw(){
-    if(fromLatLng&&toLatLng){
-        if(line)map.removeLayer(line);
-        line=L.polyline([fromLatLng,toLatLng],{color:"green",dashArray:"6"}).addTo(map);
-        map.fitBounds(line.getBounds());
-    }
+setupAutocomplete("pickup", "pickupList", data => {
+  pickupData = data;
+  if (marker1) map.removeLayer(marker1);
+  marker1 = L.marker([data.lat, data.lon]).addTo(map);
+  map.setView([data.lat, data.lon], 10);
+});
+
+setupAutocomplete("dropoff", "dropoffList", data => {
+  dropoffData = data;
+  if (marker2) map.removeLayer(marker2);
+  marker2 = L.marker([data.lat, data.lon]).addTo(map);
+  map.setView([data.lat, data.lon], 10);
+});
+
+function hitung() {
+  if (!pickupData || !dropoffData) {
+    alert("Pilih lokasi dari dropdown terlebih dahulu");
+    return;
+  }
+
+  const R = 6371;
+  const dLat = (dropoffData.lat - pickupData.lat) * Math.PI / 180;
+  const dLon = (dropoffData.lon - pickupData.lon) * Math.PI / 180;
+
+  const a =
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(pickupData.lat * Math.PI/180) *
+    Math.cos(dropoffData.lat * Math.PI/180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const distance = R * c;
+
+  const rate = document.getElementById("vehicle").value;
+  const price = Math.round(distance * rate);
+
+  document.getElementById("hasil").innerHTML =
+    `Jarak: ${distance.toFixed(1)} km<br>Estimasi Harga: Rp ${price.toLocaleString("id-ID")}`;
 }
-
-function hitung(){
-    if(!fromLatLng||!toLatLng){
-        alert("Lengkapi lokasi terlebih dahulu");
-        return;
-    }
-    const jarak=map.distance(fromLatLng,toLatLng)/1000;
-    const tarif=document.getElementById("kendaraan").value;
-    const waktu=jarak/40*60;
-    const total=(jarak*tarif)+CHARGE_PP;
-
-    document.getElementById("hasil").innerHTML=`
-    <b>Estimasi Pengiriman</b><br><br>
-    📏 Jarak: ${jarak.toFixed(1)} km<br>
-    ⏱️ Estimasi Waktu: ${Math.round(waktu)} menit<br>
-    🚚 Tarif/km: Rp ${Number(tarif).toLocaleString()}<br>
-    🔁 Charge PP: Rp ${CHARGE_PP.toLocaleString()}<br>
-    <hr>
-    <b>Total Estimasi: Rp ${Math.round(total).toLocaleString()}</b><br><br>
-    <a href="https://wa.me/${WA}?text=Halo%20Admin%2C%20saya%20ingin%20order%20pengiriman"
-    target="_blank">💬 Lanjut Order via WhatsApp</a><br><br>
-    <small>*Harga estimasi, dapat berubah sesuai kondisi lapangan</small>
-    `;
-}
-
-auto("from","fromSuggest","from");
-auto("to","toSuggest","to");
 </script>
 
 </body>
